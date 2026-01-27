@@ -40,14 +40,11 @@ RUN curl -L https://github.com/recap-org/miktex/releases/download/25.12/miktex-2
     && cd /tmp/miktex-* \
     && ./install.sh \
     && rm -rf /tmp/miktex*
-RUN https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v0.5.6/tex-fmt-aarch64-linux.tar.gz \
+RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v0.5.6/tex-fmt-aarch64-linux.tar.gz \
     | tar -xz \
     && install -m 0755 tex-fmt /usr/local/bin/tex-fmt
-RUN groupadd -g 1000 vscode && \
-    useradd -m -u 1000 -g vscode vscode && \
-    usermod -aG sudo vscode && \
-    echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers;
-USER vscode
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+USER ubuntu
 RUN pipx install cookiecutter && \
     # Install Oh My Zsh and plugins
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
