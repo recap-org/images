@@ -1,0 +1,106 @@
+variable "RECAP_VERSION" {
+  default = "2026.1"
+}
+variable "RECAP_RELEASE" {
+    default = "2026-q1"
+}
+
+variable "UBUNTU_VERSION" {
+  default = "24.04"
+}
+variable "MIKTEX_VERSION" {
+  default = "25.12"
+}
+variable "TEX_FMT_VERSION" {
+    default = "0.5.6"
+}
+variable "COOKIECUTTER_VERSION" {
+    default = "2.6.0"
+}
+variable "R_VERSION" {
+    default = "4.5.2"
+}
+variable "QUARTO_VERSION" {
+    default = "1.8.27"
+}
+variable "RADIAN_VERSION" {
+    default = "0.6.15"
+}
+variable "PLATFORMS" {
+  default = ["linux/arm64"]
+}
+
+target "common" {
+  platforms = PLATFORMS
+  labels = {
+    "org.opencontainers.image.source" = "https://github.com/recap-org/images"
+    "org.opencontainers.image.vendor" = "RECAP"
+    "org.opencontainers.image.licenses" = "MIT"
+    "org.opencontainers.image.version" = RECAP_VERSION
+    "org.opencontainers.image.source"  = "https://github.com/recap-org/recap"
+    "org.recap.release.cycle"          = RECAP_RELEASE
+    "org.recap.ubuntu.version"          = UBUNTU_VERSION
+    "org.recap.miktex.version"          = MIKTEX_VERSION
+    "org.recap.tex-fmt.version"          = TEX_FMT_VERSION
+  }
+}
+
+group "default" {
+  targets = ["core", "r"]
+}
+
+group "core" {
+  targets = ["core"]
+}
+
+group "extra" {
+  targets = ["r"]
+}
+
+target "core" {
+  inherits = ["common"]
+  context  = "."
+  dockerfile = "core/Dockerfile"
+  args = {
+    UBUNTU_VERSION       = UBUNTU_VERSION
+    MIKTEX_VERSION       = MIKTEX_VERSION
+    TEX_FMT_VERSION      = TEX_FMT_VERSION
+    COOKIECUTTER_VERSION = COOKIECUTTER_VERSION
+  }
+  labels = {
+    "org.opencontainers.image.title"="RECAP Core"
+    "org.opencontainers.image.description"="Core RECAP development environment with MikTeX and common utilities"
+  }
+  tags = [
+    "ghcr.io/recap-org/recap-core:${RECAP_VERSION}",
+    "ghcr.io/recap-org/recap-core:${RECAP_RELEASE}",
+    "ghcr.io/recap-org/recap-core:latest"
+  ]
+  output = ["type=docker"]
+}
+
+target "r" {
+  inherits = ["common"]
+  context  = "."
+  dockerfile = "r/Dockerfile"
+  depends_on = ["core"]
+  args = {
+    RECAP_VERSION       = RECAP_VERSION
+    R_VERSION       = R_VERSION
+    QUARTO_VERSION  = QUARTO_VERSION
+    RADIAN_VERSION  = RADIAN_VERSION
+  }
+  labels = {
+    "org.opencontainers.image.title"="RECAP R"
+    "org.opencontainers.image.description"="R RECAP development environment with MikTeX, R and Quarto"
+    "org.recap.r.version"          = R_VERSION
+    "org.recap.quarto.version"          = QUARTO_VERSION
+    "org.recap.radian.version"          = RADIAN_VERSION
+  }
+  tags = [
+    "ghcr.io/recap-org/recap-r:${RECAP_VERSION}",
+    "ghcr.io/recap-org/recap-r:${RECAP_RELEASE}",
+    "ghcr.io/recap-org/recap-r:latest"
+  ]
+  output = ["type=docker"]
+}

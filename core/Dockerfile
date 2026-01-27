@@ -1,16 +1,12 @@
 # syntax=docker/dockerfile:1.2
 
-FROM ubuntu:24.04
-ARG ARCH=arm64
-ENV OARCH=${ARCH}
-RUN case "$ARCH" in \
-    arm64)  OARCH=aarch64 ;; \
-    amd64)  OARCH=x86_64 ;; \
-    *) echo "Unsupported ARCH: $ARCH" && exit 1 ;; \
-    esac && \
-    echo "OARCH=$OARCH" >> /etc/environment
-ARG MIKTEX_VERSION=25.12
-ARG TEX_FMT_VERSION=0.5.6
+ARG UBUNTU_VERSION
+FROM ubuntu:${UBUNTU_VERSION}
+ARG TARGETARCH
+ARG MIKTEX_VERSION
+ARG TEX_FMT_VERSION
+ARG COOKIECUTTER_VERSION
+
 ENV MIKTEX_ROOT=/usr/local/miktex \
     PATH=/usr/local/miktex/bin:$PATH \
     LANG=en_US.UTF-8 \
@@ -45,20 +41,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN sed -i '/$LANG/s/^# //g' /etc/locale.gen && \
     locale-gen $LANG && \
     update-locale LANG=$LANG
-RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-${OARCH}.tar.xz \
+RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-$(uname -m).tar.xz \
     -o /tmp/miktex.tar.xz \
     && cd /tmp \
     && tar -xf miktex.tar.xz \
     && cd /tmp/miktex-* \
     && ./install.sh \
     && rm -rf /tmp/miktex*
-RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_VERSION}/tex-fmt-${OARCH}-linux.tar.gz \
+RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_VERSION}/tex-fmt-$(uname -m)-linux.tar.gz \
     | tar -xz \
     && install -m 0755 tex-fmt /usr/local/bin/tex-fmt
 RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN chsh -s $(which zsh)
 USER ubuntu
-RUN pipx install cookiecutter && \
+RUN pipx install cookiecutter==${COOKIECUTTER_VERSION} && \
     # Install Oh My Zsh and plugins
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
     sed -i 's/plugins=(git)/plugins=(git)/g' ~/.zshrc && \
