@@ -1,71 +1,36 @@
-# images
+# RECAP Docker Images
 Docker images for the RECAP project
+
+## Our Images
+
+- **core**: Base image built on Ubuntu 24.04, with a lightweight installation of LaTeX ([our build](https://github.com/recap-org/miktex) of [MiKTeX](https://miktex.org/), optimized for Docker), and common development dependencies. It can be used as a standalone image for writing in LaTeX or as a base for other images.
+- **r**: Extends the `core` image by adding R and Quarto.
+
+## Releases and Tags
+
+We release new versions of our images quarterly. Each image is tagged with `latest` and the corresponding version number. Each image is tagged as follows:
+
+- `<image>:latest`: the latest image in the series; e.g., `r:latest` 
+- `<image>:<year>-q<quarter>`: the latest quarterly release; e.g., `r:2024-q2`
+- `<image>:<year>.<quarter>.<build>`: specific builds of the quarterly release; used for bugfixes; e.g., `r:2024.2.1` would be the first bugfix release of the 2024 Q2 version.
+
+## Usage
+
+To use the images, you can pull them from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/recap-project/images/core:latest
+docker pull ghcr.io/recap-project/images/r:latest
+```
+
 ## Building Images
 
 This project uses Docker Buildx and `docker-bake.hcl` to build multi-platform Docker images.
 
-### Environment Files
+### Local Builds
 
-Two environment files control the build configuration:
-
-- **`.env.local`** (git-ignored): For local development
-  - Builds for `linux/arm64` only
-  - Outputs to local Docker daemon (`type=docker`)
-  - Used by default when running `docker buildx bake`
-
-- **`.env.ci`** (committed): For CI/CD builds
-  - Builds for both `linux/amd64` and `linux/arm64`
-  - Outputs to container registry (`type=registry`)
-  - Used by GitHub Actions workflow
-
-### Local Development
-
-To build locally for arm64:
+To build locally:
 
 ```bash
-# Uses .env.local by default
 docker buildx bake default
-
-# Or explicitly specify:
-docker buildx bake --file .env.local default
 ```
-
-To build just the core image:
-
-```bash
-docker buildx bake --file .env.local core
-```
-
-### CI/CD Pipeline
-
-The GitHub Actions workflow (`.github/workflows/build.yml`) automatically:
-
-- **On pull requests**: Builds images locally for validation (no push to registry)
-- **On pushes to main**: Builds multi-platform images and pushes to GitHub Container Registry (GHCR)
-
-Images are tagged as:
-- `ghcr.io/recap-org/core:2026.1` (version)
-- `ghcr.io/recap-org/core:2026-q1` (release cycle)
-- `ghcr.io/recap-org/core:latest`
-
-### Multi-Platform Builds
-
-To build multi-platform images locally (requires Docker Buildx):
-
-```bash
-docker buildx bake --file .env.ci default
-```
-
-To push to a registry from local development:
-
-```bash
-# Requires authentication with GHCR
-docker buildx bake --file .env.ci --push default
-```
-
-### Image Dependencies
-
-The `r` image depends on `core` being built first (declared via `depends_on` in the bake file). When rebuilding either image:
-
-- If the dependency already exists in the registry, Buildx will reuse it
-- If the dependency is newer and needs rebuilding, it will be built automatically

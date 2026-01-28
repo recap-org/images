@@ -48,7 +48,6 @@ target "common" {
     "org.recap.miktex.version"          = MIKTEX_VERSION
     "org.recap.tex-fmt.version"          = TEX_FMT_VERSION
   }
-  cache-to = [ "gha" ]
 }
 
 target "extra" {
@@ -98,7 +97,6 @@ target "r" {
   }
   dockerfile = "r/Dockerfile"
   args = {
-    CORE_IMAGE_VERSION = CORE_IMAGE_VERSION
     R_VERSION          = R_VERSION
     QUARTO_VERSION     = QUARTO_VERSION
     RADIAN_VERSION     = RADIAN_VERSION
