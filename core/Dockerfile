@@ -53,15 +53,16 @@ RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_
     && install -m 0755 tex-fmt /usr/local/bin/tex-fmt
 RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN chsh -s $(which zsh)
+ENV PIPX_HOME=/usr/local/pipx \
+    PIPX_BIN_DIR=/usr/local/bin
+RUN pipx install cookiecutter==${COOKIECUTTER_VERSION}
 USER ubuntu
-RUN pipx install cookiecutter==${COOKIECUTTER_VERSION} && \
-    # Install Oh My Zsh and plugins
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+# Install Oh My Zsh and plugins
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
     sed -i 's/plugins=(git)/plugins=(git)/g' ~/.zshrc && \
     # check for updates of miktex packages (remove outdated packages message)
     miktex packages update-package-database && \
     miktex packages update
-
 # Set working directory
 WORKDIR /workspaces
 # Set the default command

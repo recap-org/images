@@ -22,13 +22,13 @@ RUN curl -L https://rig.r-pkg.org/deb/rig.gpg -o /etc/apt/trusted.gpg.d/rig.gpg 
     # Clean up apt cache
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN pipx install radian==${RADIAN_VERSION}
 USER ubuntu
 # Install specific R version and set as default
 RUN rig add ${R_VERSION} && \
     rig default ${R_VERSION} && \
-    R -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver', 'ManuelHentschel/vscDebugger', 'nx10/httpgd', 'tidyverse'))" && \
-    pipx install radian==${RADIAN_VERSION} && \
-    ln -s /home/ubuntu/.local/bin/radian /usr/local/bin/radian
+    R -e "install.packages('pak')" && \
+    R -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver', 'ManuelHentschel/vscDebugger', 'nx10/httpgd'))"
 # Set working directory
 WORKDIR /workspaces
 # Set the default command
