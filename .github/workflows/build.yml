@@ -58,13 +58,12 @@ jobs:
           CORE_IMAGE="$REGISTRY/$NAMESPACE/recap-core:$CORE_VERSION"
           echo "Core version: $CORE_VERSION"
 
-
           if ! docker manifest inspect "$CORE_IMAGE" >/dev/null 2>&1; then
             echo "Will build $CORE_IMAGE"
-            echo "build_core=true" >> $GITHUB_ENV
+            echo "build_core=true" >> $GITHUB_OUTPUT
           else
             echo "Skipping $CORE_IMAGE (already exists)"
-            echo "build_core=false" >> $GITHUB_ENV
+            echo "build_core=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Build core image
@@ -74,10 +73,10 @@ jobs:
           PLATFORMS='["linux/amd64","linux/arm64"]'
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
             OUTPUT_TYPE=docker
-            docker buildx bake extra --push default
+            docker buildx bake core --push default
           else
             OUTPUT_TYPE=registry
-            docker buildx bake extra default
+            docker buildx bake core default
           fi
 
       - name: Determine images to build
