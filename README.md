@@ -4,7 +4,9 @@ Docker images for the RECAP project
 ## Our Images
 
 - **core**: Base image built on Ubuntu 24.04, with a lightweight installation of LaTeX ([our build](https://github.com/recap-org/miktex) of [MiKTeX](https://miktex.org/), optimized for Docker), and common development dependencies. It can be used as a standalone image for writing in LaTeX or as a base for other images.
-- **r**: Extends the `core` image by adding R and Quarto.
+- **r**: Adds [R](https://cran.r-project.org/) and [Quarto](https://quarto.org/) to the the `core` image.
+
+See our [Releases](https://github.com/recap-org/images/releases) page for the full list of available images and details about their software stack.
 
 ## Releases and Tags
 
