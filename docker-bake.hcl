@@ -35,8 +35,14 @@ variable "OUTPUT_TYPE" {
   description = "Output type: type=docker for local builds, type=registry for pushing to registry"
 }
 
+variable "PLATFORMS" {
+  type = list(string)
+  default = ["linux/arm64"]
+  description = "Platforms to build for"
+}
+
 target "common" {
-  platforms = ["linux/arm64"]
+  platforms = PLATFORMS
   labels = {
     "org.opencontainers.image.source" = "https://github.com/recap-org/images"
     "org.opencontainers.image.vendor" = "RECAP"

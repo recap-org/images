@@ -47,8 +47,9 @@ jobs:
       - name: Build and push images
         run: |
           OUTPUT_TYPE=registry
+          PLATFORMS='["linux/amd64","linux/arm64"]'
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            docker buildx bake --set common.platforms=linux/amd64,linux/arm64 --push default
+            docker buildx bake --push default
           else
-            docker buildx bake --set common.platforms=linux/amd64,linux/arm64 default
+            docker buildx bake default
           fi
