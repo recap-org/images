@@ -16,12 +16,7 @@ ENV MIKTEX_ROOT=/usr/local/miktex \
     PIPX_BIN_DIR=/usr/local/bin
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates git curl wget perl locales sudo \
-    python3 python3-pip python3-venv pipx \
-    \
-    # dev toolchain
-    build-essential \
-    libssl-dev libcurl4-openssl-dev libxml2-dev zlib1g-dev \
-    libglpk-dev \
+    build-essential python3 python3-pip python3-venv pipx \
     \
     # Required libraries for MiKTeX
     fontconfig \
@@ -48,7 +43,7 @@ RUN sed -i '/$LANG/s/^# //g' /etc/locale.gen && \
     update-locale LANG=$LANG && \
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US*' -exec rm -rf {} + && \
     rm -rf /usr/share/i18n
-COPY ./r/install.sh /tmp/miktex-install.sh
+COPY ./core/install.sh /tmp/miktex-install.sh
 RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-$(uname -m).tar.xz \
     -o /tmp/miktex.tar.xz \
     && cd /tmp && tar -xf miktex.tar.xz \
