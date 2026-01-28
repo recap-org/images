@@ -30,7 +30,15 @@ variable "RADIAN_VERSION" {
   default = "0.6.15"
 }
 variable "PLATFORMS" {
+  type = list(string)
   default = ["linux/arm64"]
+  description = "Platforms to build for (override with --file .env.ci for multi-platform builds)"
+}
+
+variable "OUTPUT_TYPE" {
+  type = list(string)
+  default = ["type=docker"]
+  description = "Output type: type=docker for local builds, type=registry for pushing to registry"
 }
 
 target "common" {
@@ -79,7 +87,7 @@ target "core" {
     "ghcr.io/recap-org/recap-core:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-core:latest"
   ]
-  output = ["type=docker"]
+  output = OUTPUT_TYPE
 }
 
 target "r" {
@@ -106,5 +114,5 @@ target "r" {
     "ghcr.io/recap-org/recap-r:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-r:latest"
   ]
-  output = ["type=docker"]
+  output = OUTPUT_TYPE
 }
