@@ -30,11 +30,6 @@ variable "RADIAN_VERSION" {
   default = "0.6.15"
 }
 
-variable "OUTPUT_TYPE" {
-  default = "docker"
-  description = "Output type: type=docker for local builds, type=registry for pushing to registry"
-}
-
 variable "PLATFORMS" {
   type = list(string)
   default = ["linux/arm64"]
@@ -53,6 +48,13 @@ target "common" {
     "org.recap.miktex.version"          = MIKTEX_VERSION
     "org.recap.tex-fmt.version"          = TEX_FMT_VERSION
   }
+  cache-to = [ "gha" ]
+}
+
+target "extra" {
+  contexts = {
+    core = "target:core"
+  }
 }
 
 group "default" {
@@ -69,7 +71,6 @@ group "extra" {
 
 target "core" {
   inherits = ["common"]
-  context  = "."
   dockerfile = "core/Dockerfile"
   args = {
     UBUNTU_VERSION       = UBUNTU_VERSION
@@ -83,16 +84,18 @@ target "core" {
     "org.opencontainers.image.description"="Core RECAP development environment with MikTeX and common utilities"
   }
   tags = [
-    "ghcr.io/recap-org/recap-core:${CORE_IMAGE_VERSION}",
-    "ghcr.io/recap-org/recap-core:${RECAP_RELEASE}",
-    "ghcr.io/recap-org/recap-core:latest"
+    "ghcr.io/recap-org/core:${CORE_IMAGE_VERSION}",
+    "ghcr.io/recap-org/core:${RECAP_RELEASE}",
+    "ghcr.io/recap-org/core:latest"
   ]
-  output = ["type=${OUTPUT_TYPE}"]
+  cache-from = ["type=registry,ref=ghcr.io/recap-org/core:${CORE_IMAGE_VERSION}"]
 }
 
 target "r" {
-  inherits = ["common"]
-  context  = "."
+  inherits = ["common", "extra"]
+  contexts = {
+    core = "target:core"
+  }
   dockerfile = "r/Dockerfile"
   args = {
     CORE_IMAGE_VERSION = CORE_IMAGE_VERSION
@@ -109,9 +112,9 @@ target "r" {
     "org.recap.radian.version"             = RADIAN_VERSION
   }
   tags = [
-    "ghcr.io/recap-org/recap-r:${R_IMAGE_VERSION}",
-    "ghcr.io/recap-org/recap-r:${RECAP_RELEASE}",
-    "ghcr.io/recap-org/recap-r:latest"
+    "ghcr.io/recap-org/r:${R_IMAGE_VERSION}",
+    "ghcr.io/recap-org/r:${RECAP_RELEASE}",
+    "ghcr.io/recap-org/r:latest"
   ]
-  output = ["type=${OUTPUT_TYPE}"]
+  cache-from = ["type=registry,ref=ghcr.io/recap-org/r:${R_IMAGE_VERSION}"]
 }

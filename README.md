@@ -44,9 +44,9 @@ The GitHub Actions workflow (`.github/workflows/build.yml`) automatically:
 - **On pushes to main**: Builds multi-platform images and pushes to GitHub Container Registry (GHCR)
 
 Images are tagged as:
-- `ghcr.io/recap-org/recap-core:2026.1` (version)
-- `ghcr.io/recap-org/recap-core:2026-q1` (release cycle)
-- `ghcr.io/recap-org/recap-core:latest`
+- `ghcr.io/recap-org/core:2026.1` (version)
+- `ghcr.io/recap-org/core:2026-q1` (release cycle)
+- `ghcr.io/recap-org/core:latest`
 
 ### Multi-Platform Builds
 
@@ -65,7 +65,7 @@ docker buildx bake --file .env.ci --push default
 
 ### Image Dependencies
 
-The `recap-r` image depends on `recap-core` being built first (declared via `depends_on` in the bake file). When rebuilding either image:
+The `r` image depends on `core` being built first (declared via `depends_on` in the bake file). When rebuilding either image:
 
 - If the dependency already exists in the registry, Buildx will reuse it
 - If the dependency is newer and needs rebuilding, it will be built automatically

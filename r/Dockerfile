@@ -1,7 +1,6 @@
-# syntax=docker/dockerfile:1.2
+# syntax=docker/dockerfile:1.4
 
-ARG CORE_IMAGE_VERSION
-FROM ghcr.io/recap-org/recap-core:${CORE_IMAGE_VERSION}
+FROM core
 ARG TARGETARCH
 ARG R_VERSION
 ARG QUARTO_VERSION

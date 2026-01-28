@@ -21,94 +21,19 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Resolve bake configuration
-        id: bake
-        run: |
-          docker buildx bake --print > bake.json
-          jq . bake.json
-
-      - name: Set environment variables
-        id: build_mode
-        run: |
-          echo "REGISTRY=ghcr.io" >> $GITHUB_ENV
-          echo "NAMESPACE=recap-org" >> $GITHUB_ENV
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "push=true" >> $GITHUB_OUTPUT
-            echo "Build mode: CI (push to registry)"
-          else
-            echo "push=false" >> $GITHUB_OUTPUT
-            echo "Build mode: PR (no push)"
-          fi
-
-      - name: Build core?
-        id: build_core_test
-        run: |
-          CORE_VERSION=$(jq -r '.target.core.labels["org.opencontainers.image.version"]' bake.json)
-          CORE_IMAGE="$REGISTRY/$NAMESPACE/recap-core:$CORE_VERSION"
-          echo "Core version: $CORE_VERSION"
-
-          if ! docker manifest inspect "$CORE_IMAGE" >/dev/null 2>&1; then
-            echo "Will build $CORE_IMAGE"
-            echo "build_core=true" >> $GITHUB_OUTPUT
-          else
-            echo "Skipping $CORE_IMAGE (already exists)"
-            echo "build_core=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Build core image
-        id: build_core
-        if: steps.build_core_test.outputs.build_core == 'true'
-        run: |
-          PLATFORMS='["linux/amd64","linux/arm64"]'
-          if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            OUTPUT_TYPE=registry
-            docker buildx bake --push core
-          else
-            OUTPUT_TYPE=docker
-            docker buildx bake core
-          fi
-
-      - name: Determine images to build
-        id: targets
-        run: |
-          TARGETS=()
-          R_VERSION=$(jq -r '.target.r.labels["org.opencontainers.image.version"]' bake.json)
-          R_IMAGE="$REGISTRY/$NAMESPACE/recap-r:$R_VERSION"
-          echo "R version:    $R_VERSION"
-
-          if ! docker manifest inspect "$R_IMAGE" >/dev/null 2>&1; then
-            echo "Will build $R_IMAGE"
-            TARGETS+=("r")
-          else
-            echo "Skipping $R_IMAGE (already exists)"
-          fi
-
-          if [ "${#TARGETS[@]}" -eq 0 ]; then
-            echo "Nothing to build."
-            exit 0
-          fi
-
-          echo "targets=${TARGETS[*]}" >> "$GITHUB_OUTPUT"
-
-      - name: Build & push missing images (multi-arch)
-        if: steps.targets.outputs.targets != ''
-        run: |
-          PLATFORMS='["linux/amd64","linux/arm64"]'
-          if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            OUTPUT_TYPE=registry
-            docker buildx bake --push ${{ steps.targets.outputs.targets }}
-          else
-            OUTPUT_TYPE=docker
-            docker buildx bake ${{ steps.targets.outputs.targets }}
-          fi
+      - name: Build and maybe Push
+        uses: docker/bake-action@v4
+        with:
+          push: github.event_name == 'push' && github.ref == 'refs/heads/main'
+          set: |
+            *.platform=linux/amd64,linux/arm64

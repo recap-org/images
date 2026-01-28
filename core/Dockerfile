@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.2
+# syntax=docker/dockerfile:1.4
 
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION}
