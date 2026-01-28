@@ -29,11 +29,6 @@ variable "QUARTO_VERSION" {
 variable "RADIAN_VERSION" {
   default = "0.6.15"
 }
-variable "PLATFORMS" {
-  type = list(string)
-  default = ["linux/arm64"]
-  description = "Platforms to build for (override with --file .env.ci for multi-platform builds)"
-}
 
 variable "OUTPUT_TYPE" {
   default = "docker"
@@ -41,7 +36,7 @@ variable "OUTPUT_TYPE" {
 }
 
 target "common" {
-  platforms = PLATFORMS
+  platforms = ["linux/arm64"]
   labels = {
     "org.opencontainers.image.source" = "https://github.com/recap-org/images"
     "org.opencontainers.image.vendor" = "RECAP"
