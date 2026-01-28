@@ -1,8 +1,11 @@
-variable "RECAP_VERSION" {
+variable "CORE_IMAGE_VERSION" {
+  default = "2026.1"
+}
+variable "R_IMAGE_VERSION" {
   default = "2026.1"
 }
 variable "RECAP_RELEASE" {
-    default = "2026-q1"
+  default = "2026-q1"
 }
 
 variable "UBUNTU_VERSION" {
@@ -12,19 +15,19 @@ variable "MIKTEX_VERSION" {
   default = "25.12"
 }
 variable "TEX_FMT_VERSION" {
-    default = "0.5.6"
+  default = "0.5.6"
 }
 variable "COOKIECUTTER_VERSION" {
-    default = "2.6.0"
+  default = "2.6.0"
 }
 variable "R_VERSION" {
-    default = "4.5.2"
+  default = "4.5.2"
 }
 variable "QUARTO_VERSION" {
-    default = "1.8.27"
+  default = "1.8.27"
 }
 variable "RADIAN_VERSION" {
-    default = "0.6.15"
+  default = "0.6.15"
 }
 variable "PLATFORMS" {
   default = ["linux/arm64"]
@@ -36,7 +39,6 @@ target "common" {
     "org.opencontainers.image.source" = "https://github.com/recap-org/images"
     "org.opencontainers.image.vendor" = "RECAP"
     "org.opencontainers.image.licenses" = "MIT"
-    "org.opencontainers.image.version" = RECAP_VERSION
     "org.opencontainers.image.source"  = "https://github.com/recap-org/recap"
     "org.recap.release.cycle"          = RECAP_RELEASE
     "org.recap.ubuntu.version"          = UBUNTU_VERSION
@@ -68,11 +70,12 @@ target "core" {
     COOKIECUTTER_VERSION = COOKIECUTTER_VERSION
   }
   labels = {
+    "org.opencontainers.image.version" = CORE_IMAGE_VERSION
     "org.opencontainers.image.title"="RECAP Core"
     "org.opencontainers.image.description"="Core RECAP development environment with MikTeX and common utilities"
   }
   tags = [
-    "ghcr.io/recap-org/recap-core:${RECAP_VERSION}",
+    "ghcr.io/recap-org/recap-core:${CORE_IMAGE_VERSION}",
     "ghcr.io/recap-org/recap-core:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-core:latest"
   ]
@@ -85,20 +88,21 @@ target "r" {
   dockerfile = "r/Dockerfile"
   depends_on = ["core"]
   args = {
-    RECAP_VERSION       = RECAP_VERSION
-    R_VERSION       = R_VERSION
-    QUARTO_VERSION  = QUARTO_VERSION
-    RADIAN_VERSION  = RADIAN_VERSION
+    CORE_IMAGE_VERSION = CORE_IMAGE_VERSION
+    R_VERSION          = R_VERSION
+    QUARTO_VERSION     = QUARTO_VERSION
+    RADIAN_VERSION     = RADIAN_VERSION
   }
   labels = {
-    "org.opencontainers.image.title"="RECAP R"
-    "org.opencontainers.image.description"="R RECAP development environment with MikTeX, R and Quarto"
-    "org.recap.r.version"          = R_VERSION
-    "org.recap.quarto.version"          = QUARTO_VERSION
-    "org.recap.radian.version"          = RADIAN_VERSION
+    "org.opencontainers.image.version"     = R_IMAGE_VERSION
+    "org.opencontainers.image.title"       = "RECAP R"
+    "org.opencontainers.image.description" = "R RECAP development environment with MikTeX, R and Quarto"
+    "org.recap.r.version"                  = R_VERSION
+    "org.recap.quarto.version"             = QUARTO_VERSION
+    "org.recap.radian.version"             = RADIAN_VERSION
   }
   tags = [
-    "ghcr.io/recap-org/recap-r:${RECAP_VERSION}",
+    "ghcr.io/recap-org/recap-r:${R_IMAGE_VERSION}",
     "ghcr.io/recap-org/recap-r:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-r:latest"
   ]
