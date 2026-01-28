@@ -72,10 +72,10 @@ jobs:
         run: |
           PLATFORMS='["linux/amd64","linux/arm64"]'
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            OUTPUT_TYPE=docker
+            OUTPUT_TYPE=registry
             docker buildx bake core --push default
           else
-            OUTPUT_TYPE=registry
+            OUTPUT_TYPE=docker
             docker buildx bake core default
           fi
 
@@ -106,9 +106,9 @@ jobs:
         run: |
           PLATFORMS='["linux/amd64","linux/arm64"]'
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            OUTPUT_TYPE=docker
+            OUTPUT_TYPE=registry
             docker buildx bake ${{ steps.targets.outputs.targets }} --push default
           else
-            OUTPUT_TYPE=registry
+            OUTPUT_TYPE=docker
             docker buildx bake ${{ steps.targets.outputs.targets }} default
           fi
