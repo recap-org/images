@@ -36,8 +36,7 @@ variable "PLATFORMS" {
 }
 
 variable "OUTPUT_TYPE" {
-  type = list(string)
-  default = ["type=docker"]
+  default = "docker"
   description = "Output type: type=docker for local builds, type=registry for pushing to registry"
 }
 
@@ -87,7 +86,7 @@ target "core" {
     "ghcr.io/recap-org/recap-core:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-core:latest"
   ]
-  output = OUTPUT_TYPE
+  output = ["type=${OUTPUT_TYPE}"]
 }
 
 target "r" {
@@ -114,5 +113,5 @@ target "r" {
     "ghcr.io/recap-org/recap-r:${RECAP_RELEASE}",
     "ghcr.io/recap-org/recap-r:latest"
   ]
-  output = OUTPUT_TYPE
+  output = ["type=${OUTPUT_TYPE}"]
 }

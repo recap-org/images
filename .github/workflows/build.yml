@@ -46,12 +46,9 @@ jobs:
 
       - name: Build and push images
         run: |
-          set -a
-          source .env.ci
-          set +a
-
+          OUTPUT_TYPE=registry
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-            docker buildx bake --push default
+            docker buildx bake --set common.platforms=linux/amd64,linux/arm64 --push default
           else
-            docker buildx bake default
+            docker buildx bake --set common.platforms=linux/amd64,linux/arm64 default
           fi
