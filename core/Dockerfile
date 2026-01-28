@@ -36,17 +36,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release bash-completion \
     openssh-client \
     \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/* /tmp/* /var/tmp/* \
+    && rm -rf /usr/share/man \
+    /usr/share/doc \
+    /usr/share/info
 RUN sed -i '/$LANG/s/^# //g' /etc/locale.gen && \
     locale-gen $LANG && \
-    update-locale LANG=$LANG
+    update-locale LANG=$LANG && \
+    # trim locales to only the one we need
+    && rm -rf /usr/share/locale/*
+COPY ./r/install.sh /tmp/miktex-install.sh
 RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-$(uname -m).tar.xz \
     -o /tmp/miktex.tar.xz \
     && cd /tmp \
     && tar -xf miktex.tar.xz \
-    && cd /tmp/miktex-* \
-    && ./install.sh \
+    && /tmp/miktex-install.sh --from /tmp/miktex*/miktex \
     && rm -rf /tmp/miktex*
 RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_VERSION}/tex-fmt-$(uname -m)-linux.tar.gz \
     | tar -xz \
