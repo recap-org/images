@@ -38,16 +38,22 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "push=true" >> $GITHUB_OUTPUT
+            echo "env_file=.env.ci" >> $GITHUB_OUTPUT
             echo "Build mode: CI (push to registry)"
           else
             echo "push=false" >> $GITHUB_OUTPUT
+            echo "env_file=.env.local" >> $GITHUB_OUTPUT
             echo "Build mode: PR (no push)"
           fi
 
       - name: Build and push images
         run: |
+          set -a
+          source ${{ steps.build_mode.outputs.env_file }}
+          set +a
+
           if [[ "${{ steps.build_mode.outputs.push }}" == "true" ]]; then
-              docker buildx bake --file .env.ci --push default
+            docker buildx bake --push default
           else
-              docker buildx bake --file .env.ci default
+            docker buildx bake default
           fi
