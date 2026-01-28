@@ -94,7 +94,6 @@ target "r" {
   inherits = ["common"]
   context  = "."
   dockerfile = "r/Dockerfile"
-  depends_on = ["core"]
   args = {
     CORE_IMAGE_VERSION = CORE_IMAGE_VERSION
     R_VERSION          = R_VERSION
