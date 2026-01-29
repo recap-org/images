@@ -13,16 +13,16 @@ See our [Releases](https://github.com/recap-org/images/releases) page for the fu
 We release new versions of our images quarterly. Each image is tagged with `latest` and the corresponding version number. Each image is tagged as follows:
 
 - `<image>:latest`: the latest image in the series; e.g., `r:latest` 
-- `<image>:<year>-q<quarter>`: the latest quarterly release; e.g., `r:2024-q2`
-- `<image>:<year>.<quarter>.<build>`: specific builds of the quarterly release; used for bugfixes; e.g., `r:2024.2.1` would be the first bugfix release of the 2024 Q2 version.
+- `<image>:<year>-q<quarter>`: the latest quarterly release; e.g., `r:2026-q1`
+- `<image>:<year>.<quarter>.<build>`: specific builds of the quarterly release; used for bugfixes; e.g., `r:2026.1.1` would be the first bugfix release of the 2026 Q1 version.
 
 ## Usage
 
 To use the images, you can pull them from GitHub Container Registry:
 
 ```bash
-docker pull ghcr.io/recap-project/images/core:latest
-docker pull ghcr.io/recap-project/images/r:latest
+docker pull ghcr.io/recap-org/core:latest
+docker pull ghcr.io/recap-org/r:latest
 ```
 
 ## Building Images
