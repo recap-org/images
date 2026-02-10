@@ -30,6 +30,8 @@ USER ubuntu
 RUN rig add ${R_VERSION} && \
     rig default ${R_VERSION} && \
     R -e "install.packages(c('pak', 'renv', 'rmarkdown', 'languageserver'))" && \
+    # temporary (?) patch for httpgd: unigd removed from CRAN; install from source instead
+    # future releases should look into https://github.com/grantmcdermott/jgd
     R -e "pak::pkg_install(c('ManuelHentschel/vscDebugger', 'nx10/unigd', 'nx10/httpgd'))" && \
     sudo apt-get purge -y --auto-remove && \
     sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/* && \

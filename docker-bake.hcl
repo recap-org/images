@@ -1,5 +1,5 @@
 variable "CORE_IMAGE_VERSION" {
-  default = "2026.1.1"
+  default = "2026.1.2"
 }
 variable "R_IMAGE_VERSION" {
   default = "2026.1.2"
