@@ -22,10 +22,9 @@ RUN curl -L https://rig.r-pkg.org/deb/rig.gpg -o /etc/apt/trusted.gpg.d/rig.gpg 
 # Install radian via pipx
 RUN pipx install radian==${RADIAN_VERSION} && \
     rm -rf ${PIPX_HOME}/venvs/*/lib/*/site-packages/tests
-# Create renv cache directory
+# Create renv cache directory and give all rights to all users
 RUN mkdir -p /renv/cache && \
-    chown -R ubuntu:ubuntu /renv && \
-    chmod -R 755 /renv
+    chmod -R a+rwX /renv
 USER ubuntu
 # Install specific R version and set as default
 RUN rig add ${R_VERSION} && \

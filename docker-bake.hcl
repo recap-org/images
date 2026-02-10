@@ -2,7 +2,7 @@ variable "CORE_IMAGE_VERSION" {
   default = "2026.1.1"
 }
 variable "R_IMAGE_VERSION" {
-  default = "2026.1.1"
+  default = "2026.1.2"
 }
 variable "RECAP_RELEASE" {
   default = "2026-q1"
