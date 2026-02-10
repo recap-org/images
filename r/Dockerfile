@@ -30,7 +30,7 @@ USER ubuntu
 RUN rig add ${R_VERSION} && \
     rig default ${R_VERSION} && \
     R -e "install.packages(c('pak', 'renv', 'rmarkdown', 'languageserver'))" && \
-    R -e "pak::pkg_install(c('ManuelHentschel/vscDebugger', 'unigd@0.1.3', 'nx10/httpgd'))" && \
+    R -e "pak::pkg_install(c('ManuelHentschel/vscDebugger', 'nx10/unigd', 'nx10/httpgd'))" && \
     sudo apt-get purge -y --auto-remove && \
     sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/* && \
     sudo find /usr/share/doc -depth -type f ! -name copyright -delete && \
