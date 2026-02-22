@@ -1,8 +1,5 @@
-variable "CORE_IMAGE_VERSION" {
-  default = "2026.1.2"
-}
-variable "R_IMAGE_VERSION" {
-  default = "2026.1.2"
+variable "IMAGE_VERSION" {
+  default = "2026.1.3"
 }
 variable "RECAP_RELEASE" {
   default = "2026-q1"
@@ -29,10 +26,13 @@ variable "QUARTO_VERSION" {
 variable "RADIAN_VERSION" {
   default = "0.6.15"
 }
+variable "STATA_VERSION" {
+  default = "Now 19 MP"
+}
 
 variable "PLATFORMS" {
   type = list(string)
-  default = ["linux/arm64"]
+  default = ["linux/amd64", "linux/arm64"]
   description = "Platforms to build for"
 }
 
@@ -57,7 +57,7 @@ target "extra" {
 }
 
 group "default" {
-  targets = ["core", "r"]
+  targets = ["core", "r", "stata"]
 }
 
 group "core" {
@@ -65,7 +65,7 @@ group "core" {
 }
 
 group "extra" {
-  targets = ["r"]
+  targets = ["r", "stata"]
 }
 
 target "core" {
@@ -76,18 +76,21 @@ target "core" {
     MIKTEX_VERSION       = MIKTEX_VERSION
     TEX_FMT_VERSION      = TEX_FMT_VERSION
     COOKIECUTTER_VERSION = COOKIECUTTER_VERSION
+    R_VERSION          = R_VERSION
+    QUARTO_VERSION     = QUARTO_VERSION
+    RADIAN_VERSION     = RADIAN_VERSION
+    STATA_VERSION      = STATA_VERSION
   }
   labels = {
-    "org.opencontainers.image.version" = CORE_IMAGE_VERSION
+    "org.opencontainers.image.version" = IMAGE_VERSION
     "org.opencontainers.image.title"="RECAP Core"
     "org.opencontainers.image.description"="Core RECAP development environment with MikTeX and common utilities"
   }
   tags = [
-    "ghcr.io/recap-org/core:${CORE_IMAGE_VERSION}",
+    "ghcr.io/recap-org/core:${IMAGE_VERSION}",
     "ghcr.io/recap-org/core:${RECAP_RELEASE}",
     "ghcr.io/recap-org/core:latest"
   ]
-  cache-from = ["type=registry,ref=ghcr.io/recap-org/core:${CORE_IMAGE_VERSION}"]
 }
 
 target "r" {
@@ -96,13 +99,8 @@ target "r" {
     core = "target:core"
   }
   dockerfile = "r/Dockerfile"
-  args = {
-    R_VERSION          = R_VERSION
-    QUARTO_VERSION     = QUARTO_VERSION
-    RADIAN_VERSION     = RADIAN_VERSION
-  }
   labels = {
-    "org.opencontainers.image.version"     = R_IMAGE_VERSION
+    "org.opencontainers.image.version"     = IMAGE_VERSION
     "org.opencontainers.image.title"       = "RECAP R"
     "org.opencontainers.image.description" = "R RECAP development environment with MikTeX, R and Quarto"
     "org.recap.r.version"                  = R_VERSION
@@ -110,9 +108,28 @@ target "r" {
     "org.recap.radian.version"             = RADIAN_VERSION
   }
   tags = [
-    "ghcr.io/recap-org/r:${R_IMAGE_VERSION}",
+    "ghcr.io/recap-org/r:${IMAGE_VERSION}",
     "ghcr.io/recap-org/r:${RECAP_RELEASE}",
     "ghcr.io/recap-org/r:latest"
   ]
-  cache-from = ["type=registry,ref=ghcr.io/recap-org/r:${R_IMAGE_VERSION}"]
+}
+
+target "stata" {
+  inherits = ["common", "extra"]
+  platforms = ["linux/amd64"]
+  contexts = {
+    core = "target:core"
+  }
+  dockerfile = "stata/Dockerfile"
+  labels = {
+    "org.opencontainers.image.version"     = IMAGE_VERSION
+    "org.opencontainers.image.title"       = "RECAP Stata"
+    "org.opencontainers.image.description" = "Stata RECAP development environment with MikTeX and Stata"
+    "org.recap.stata.version"              = STATA_VERSION
+  }
+  tags = [
+    "ghcr.io/recap-org/stata:${IMAGE_VERSION}",
+    "ghcr.io/recap-org/stata:${RECAP_RELEASE}",
+    "ghcr.io/recap-org/stata:latest"
+  ]
 }

@@ -6,9 +6,20 @@ ARG TARGETARCH
 ARG MIKTEX_VERSION
 ARG TEX_FMT_VERSION
 ARG COOKIECUTTER_VERSION
+ARG R_VERSION
+ARG QUARTO_VERSION
+ARG RADIAN_VERSION
+ARG STATA_VERSION
 
 ENV MIKTEX_ROOT=/usr/local/miktex \
     PATH=/usr/local/miktex/bin:$PATH \
+    MIKTEX_VERSION=${MIKTEX_VERSION} \
+    TEX_FMT_VERSION=${TEX_FMT_VERSION} \
+    COOKIECUTTER_VERSION=${COOKIECUTTER_VERSION} \
+    R_VERSION=${R_VERSION} \
+    QUARTO_VERSION=${QUARTO_VERSION} \
+    RADIAN_VERSION=${RADIAN_VERSION} \
+    STATA_VERSION=${STATA_VERSION} \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
@@ -43,7 +54,6 @@ RUN sed -i '/$LANG/s/^# //g' /etc/locale.gen && \
     update-locale LANG=$LANG && \
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US*' -exec rm -rf {} + && \
     rm -rf /usr/share/i18n
-COPY ./core/install.sh /tmp/miktex-install.sh
 RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-$(uname -m).tar.xz \
     -o /tmp/miktex.tar.xz \
     && cd /tmp && tar -xf miktex.tar.xz \
@@ -58,6 +68,8 @@ RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     chsh -s $(which zsh)
 RUN pipx install cookiecutter==${COOKIECUTTER_VERSION} && \
     rm -rf ${PIPX_HOME}/venvs/*/lib/*/site-packages/tests
+COPY ./scripts /scripts
+RUN chmod +x /scripts/*
 USER ubuntu
 # Install Oh My Zsh and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
