@@ -1,5 +1,5 @@
 variable "IMAGE_VERSION" {
-  default = "2026.1.2"
+  default = "2026.1.3"
 }
 variable "RECAP_RELEASE" {
   default = "2026-q1"
@@ -29,13 +29,10 @@ variable "RADIAN_VERSION" {
 variable "STATA_VERSION" {
   default = "Now 19 MP"
 }
-variable "STATA_SRC_IMAGE_VERSION" {
-  default = "dataeditors/stata19_5-mp-x:2026-02-18"
-}
 
 variable "PLATFORMS" {
   type = list(string)
-  default = ["linux/arm64"]
+  default = ["linux/amd64", "linux/arm64"]
   description = "Platforms to build for"
 }
 
@@ -60,7 +57,7 @@ target "extra" {
 }
 
 group "default" {
-  targets = ["core", "r"]
+  targets = ["core", "r", "stata"]
 }
 
 group "core" {
@@ -68,7 +65,7 @@ group "core" {
 }
 
 group "extra" {
-  targets = ["r"]
+  targets = ["r", "stata"]
 }
 
 target "core" {
@@ -119,13 +116,11 @@ target "r" {
 
 target "stata" {
   inherits = ["common", "extra"]
+  platforms = ["linux/amd64"]
   contexts = {
     core = "target:core"
   }
   dockerfile = "stata/Dockerfile"
-  args = {
-    STATA_SRC_IMAGE_VERSION = STATA_SRC_IMAGE_VERSION
-  }
   labels = {
     "org.opencontainers.image.version"     = IMAGE_VERSION
     "org.opencontainers.image.title"       = "RECAP Stata"

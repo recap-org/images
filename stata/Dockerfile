@@ -1,11 +1,9 @@
 # syntax=docker/dockerfile:1.4
 
 FROM core
-ARG STATA_SRC_IMAGE_VERSION
 USER root
-COPY --from=${STATA_SRC_IMAGE_VERSION} /usr/local/stata /usr/local/stata
+COPY --from=dataeditors/stata19_5-mp-x:2026-02-18 /usr/local/stata /usr/local/stata
 ENV PATH="/usr/local/stata:${PATH}"
-COPY stata.lic /usr/local/stata/stata.lic
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libncurses6
 RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \

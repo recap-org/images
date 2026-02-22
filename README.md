@@ -5,6 +5,7 @@ Docker images for the RECAP project
 
 - **core**: Base image built on Ubuntu 24.04, with a lightweight installation of LaTeX ([our build](https://github.com/recap-org/miktex) of [MiKTeX](https://miktex.org/), optimized for Docker), and common development dependencies. It can be used as a standalone image for writing in LaTeX or as a base for other images.
 - **r**: Adds [R](https://cran.r-project.org/) and [Quarto](https://quarto.org/) to the the `core` image.
+- **stata**: Adds [Stata](https://www.stata.com/) to the the `core` image.
 
 See our [Releases](https://github.com/recap-org/images/releases) page for the full list of available images and details about their software stack.
 
@@ -23,6 +24,16 @@ To use the images, you can pull them from GitHub Container Registry:
 ```bash
 docker pull ghcr.io/recap-org/core:latest
 docker pull ghcr.io/recap-org/r:latest
+```
+
+## Composing Images
+
+Most of our images use free software. For those, we provide installation scripts in `/scripts` that allow easy addition of features from an image into another by writing simple Dockerfiles. For instance, adding R and Quarto to the Stata image can be achieved with the following Dockerfile. 
+
+```Dockerfile
+FROM ghcr.io/recap-org/stata:latest
+RUN /scripts/install_R.sh
+RUN /scripts/install_quarto.sh
 ```
 
 ## Building Images
