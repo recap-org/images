@@ -50,9 +50,10 @@ sudo rm -rf /usr/share/man/* /usr/share/info/*
 
 sudo mkdir -p /usr/local/lib/R/site-library
 sudo chown -R ${RECAP_USER:-ubuntu} /usr/local/lib/R/site-library
+sudo chmod -R a+rwX /usr/local/lib/R/site-library
 
 # Install R packages
-cat >> ~/.Rprofile <<'EOF'
+sudo tee -a /usr/lib/R/etc/Rprofile.site > /dev/null <<'EOF'
 options(
   repos = c(
     CRAN = sprintf(
@@ -60,14 +61,22 @@ options(
       R.version["arch"],
       substr(getRversion(), 1, 3)
     )
+  ),
+  download.file.method = 'libcurl'
+)
+options(
+  HTTPUserAgent = sprintf(
+    "R/%s R (%s)", 
+    getRversion(), 
+    paste(getRversion(), R.version["platform"], R.version["arch"], R.version["os"])
   )
 )
 EOF
-Rscript -e "install.packages(c('pak', 'renv', 'rmarkdown', 'languageserver'))"
-Rscript -e "pak::pkg_install(c('ManuelHentschel/vscDebugger', 'nx10/unigd', 'nx10/httpgd'))"
+Rscript -e "install.packages('pak')"
+Rscript -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver','ManuelHentschel/vscDebugger', 'nx10/httpgd'))"
 
 # Install radian via pipx
-sudo pipx install radian==${RADIAN_VERSION}
+sudo -E pipx install radian==${RADIAN_VERSION}
 sudo rm -rf ${PIPX_HOME}/venvs/*/lib/*/site-packages/tests
 sudo mkdir -p /renv/cache
 sudo chmod -R a+rwX /renv
