@@ -53,24 +53,23 @@ sudo chown -R ${RECAP_USER:-ubuntu} /usr/local/lib/R/site-library
 sudo chmod -R a+rwX /usr/local/lib/R/site-library
 
 # Install R packages
-sudo tee -a /usr/lib/R/etc/Rprofile.site > /dev/null <<'EOF'
-options(
-  repos = c(
-    CRAN = sprintf(
-      "https://packagemanager.posit.co/cran/latest/bin/linux/noble-%s/%s",
-      R.version["arch"],
-      substr(getRversion(), 1, 3)
-    )
-  ),
-  download.file.method = 'libcurl'
-)
-options(
-  HTTPUserAgent = sprintf(
-    "R/%s R (%s)", 
-    getRversion(), 
-    paste(getRversion(), R.version["platform"], R.version["arch"], R.version["os"])
+sudo tee /usr/lib/R/etc/Rprofile.site > /dev/null <<'EOF'
+local({
+  options(
+    repos = c(
+      P3M = 'https://packagemanager.posit.co/cran/__linux__/noble/latest',
+      CRAN = 'https://packagemanager.posit.co/cran/latest'
+    ),
+    download.file.method = 'libcurl'
   )
-)
+  options(
+    HTTPUserAgent = sprintf(
+      "R/%s R (%s)", 
+      getRversion(), 
+      paste(getRversion(), R.version["platform"], R.version["arch"], R.version["os"])
+    )
+  )
+})
 EOF
 Rscript -e "install.packages('pak')"
 Rscript -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver','ManuelHentschel/vscDebugger', 'nx10/httpgd'))"
