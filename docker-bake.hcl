@@ -1,5 +1,5 @@
 variable "IMAGE_VERSION" {
-  default = "2026.1.4"
+  default = "2026.1.5"
 }
 variable "RECAP_RELEASE" {
   default = "2026-q1"

@@ -35,3 +35,5 @@ jobs:
         uses: docker/bake-action@v6
         with:
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          set: ${{ github.event_name == 'pull_request' && '*.platform=linux/amd64' || '' }}
+        
