@@ -1,0 +1,23 @@
+#!/bin/bash
+set -euo pipefail
+
+LICENSE_TARGET="/usr/local/stata/stata.lic"
+LICENSE_SOURCE="./stata.lic"
+
+if [ -n "${LICENSE_SOURCE}" ]; then
+  sudo install "${LICENSE_SOURCE}" "${LICENSE_TARGET}"
+else
+  echo ""
+  echo "────────────────────────────────────────────"
+  echo "⚠️  Stata is not activated."
+  echo ""
+  echo "To activate:"
+  echo ""
+  echo "  1) Copy 'stata.lic.example' to 'stata.lic'"
+  echo "  2) Fill it using information from your Stata license PDF"
+  echo "  3) Run:"
+  echo ""
+  echo "       install-stata-license"
+  echo ""
+  echo "────────────────────────────────────────────"
+fi

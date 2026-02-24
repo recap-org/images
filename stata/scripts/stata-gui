@@ -3,6 +3,9 @@
 PORT=10000
 DISPLAY_NUM=100
 
+# Set the cursor size to a reasonable value for high-DPI displays
+XCURSOR_SIZE=24
+
 echo ""
 echo "🚀 RECAP Stata GUI"
 echo ""

@@ -22,8 +22,8 @@ ENV XDG_RUNTIME_DIR=/tmp/runtime-ubuntu
 RUN mkdir -p /tmp/runtime-ubuntu && \
     chown ubuntu:ubuntu /tmp/runtime-ubuntu && \
     chmod 700 /tmp/runtime-ubuntu
-COPY ./stata/start-stata-gui.sh /usr/local/bin/stata-gui
-RUN chmod +x /usr/local/bin/stata-gui
+COPY ./stata/scripts/* /usr/local/bin/
+RUN chmod +x /usr/local/bin/stata-gui /usr/local/bin/install-stata-license
 USER ubuntu
 # Set working directory
 WORKDIR /workspaces
