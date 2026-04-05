@@ -54,12 +54,6 @@ RUN sed -i '/$LANG/s/^# //g' /etc/locale.gen && \
     update-locale LANG=$LANG && \
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en_US*' -exec rm -rf {} + && \
     rm -rf /usr/share/i18n
-RUN curl -L https://github.com/recap-org/miktex/releases/download/${MIKTEX_VERSION}/miktex-${MIKTEX_VERSION}-linux-$(uname -m).tar.xz \
-    -o /tmp/miktex.tar.xz \
-    && cd /tmp && tar -xf miktex.tar.xz \
-    && mkdir -p ${MIKTEX_ROOT} \
-    && cp -r /tmp/miktex*/miktex/* ${MIKTEX_ROOT} \
-    && rm -rf /tmp/miktex* /tmp/*.sh
 RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_VERSION}/tex-fmt-$(uname -m)-linux.tar.gz \
     | tar -xz \
     && install -m 0755 tex-fmt /usr/local/bin/tex-fmt \
@@ -74,31 +68,9 @@ USER ubuntu
 # Install Oh My Zsh and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
     sed -i 's/plugins=(git)/plugins=(git)/g' ~/.zshrc
-# Finalize miktex install
-RUN sudo ${MIKTEX_ROOT}/bin/initexmf --admin --set-config-value [MPM]AutoInstall=1 && \
-    initexmf --set-config-value [MPM]AutoInstall=1 && \
-    sudo ${MIKTEX_ROOT}/bin/initexmf --admin --set-config-value [Core]InstallDocFiles=0 && \
-    initexmf --set-config-value [Core]InstallDocFiles=0 && \
-    sudo ${MIKTEX_ROOT}/bin/initexmf --admin --set-config-value [Core]InstallSourceFiles=0 && \
-    initexmf --set-config-value [Core]InstallSourceFiles=0 && \
-    sudo ${MIKTEX_ROOT}/bin/miktex --admin packages update-package-database && \
-    sudo ${MIKTEX_ROOT}/bin/miktex --admin packages update && \
-    miktex packages update-package-database && \
-    miktex packages update && \
-    initexmf --update-fndb && \
-    mpm --verbose --package-level=basic --upgrade && \
-    # Install required packages for luatex/lualatex format creation
-    mpm --install etex && \
-    mpm --install lua-uni-algos && \
-    mpm --install xkeyval && \
-    mpm --install latexmk && \
-    initexmf --update-fndb && \
-    # patch a bug in a latex def file
-    ln -sf utf8.def "/home/ubuntu/.miktex/texmfs/install/tex/latex/base/utf-8.def" && \
-    sudo ${MIKTEX_ROOT}/bin/initexmf --admin --mklinks && \
-    # Clear MiKTeX caches
-    rm -rf /home/ubuntu/.miktex/data/miktex/cache && \
-    sudo rm -rf ${MIKTEX_ROOT}/texmfs/*/miktex/cache
+# Install MiKTeX
+RUN curl -fsSL https://raw.githubusercontent.com/recap-org/miktex/dev/install.sh \
+    | bash -s -- --version ${MIKTEX_VERSION}
 # Set working directory
 WORKDIR /workspaces
 # Set the default command

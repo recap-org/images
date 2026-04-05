@@ -9,7 +9,7 @@ variable "UBUNTU_VERSION" {
   default = "24.04"
 }
 variable "MIKTEX_VERSION" {
-  default = "25.12"
+  default = "26.2"
 }
 variable "TEX_FMT_VERSION" {
   default = "0.5.6"
