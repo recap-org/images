@@ -1,33 +1,39 @@
 # syntax=docker/dockerfile:1.4
 
 ARG UBUNTU_VERSION
+ARG UV_VERSION
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 FROM ubuntu:${UBUNTU_VERSION}
 ARG TARGETARCH
 ARG MIKTEX_VERSION
 ARG TEX_FMT_VERSION
+ARG UV_VERSION
+ARG PYTHON_VERSION
 ARG COOKIECUTTER_VERSION
 ARG R_VERSION
 ARG QUARTO_VERSION
 ARG RADIAN_VERSION
+ARG RV_VERSION
 ARG STATA_VERSION
 
 ENV MIKTEX_ROOT=/usr/local/miktex \
     PATH=/usr/local/miktex/bin:$PATH \
     MIKTEX_VERSION=${MIKTEX_VERSION} \
     TEX_FMT_VERSION=${TEX_FMT_VERSION} \
+    UV_VERSION=${UV_VERSION} \
+    PYTHON_VERSION=${PYTHON_VERSION} \
     COOKIECUTTER_VERSION=${COOKIECUTTER_VERSION} \
     R_VERSION=${R_VERSION} \
     QUARTO_VERSION=${QUARTO_VERSION} \
     RADIAN_VERSION=${RADIAN_VERSION} \
+    RV_VERSION=${RV_VERSION} \
     STATA_VERSION=${STATA_VERSION} \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8 \
-    PIPX_HOME=/usr/local/pipx \
-    PIPX_BIN_DIR=/usr/local/bin
+    LC_ALL=en_US.UTF-8
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates git curl wget perl locales sudo \
-    build-essential python3 python3-pip python3-venv pipx \
+    build-essential python3 \
     \
     # Required libraries for MiKTeX
     fontconfig \
@@ -43,6 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     less jq tree htop nano dialog \
     lsb-release bash-completion \
     openssh-client \
+    pandoc \
     \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/* /tmp/* /var/tmp/*  \
@@ -58,13 +65,23 @@ RUN curl -L https://github.com/WGUNDERWOOD/tex-fmt/releases/download/v${TEX_FMT_
     | tar -xz \
     && install -m 0755 tex-fmt /usr/local/bin/tex-fmt \
     && rm -f tex-fmt
+COPY --from=uv /uv /uvx /usr/local/bin/
 RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     chsh -s $(which zsh)
-RUN pipx install cookiecutter==${COOKIECUTTER_VERSION} && \
-    rm -rf ${PIPX_HOME}/venvs/*/lib/*/site-packages/tests
 COPY ./scripts /scripts
 RUN chmod +x /scripts/*
 USER ubuntu
+ENV PATH="/home/ubuntu/.local/bin:${PATH}"
+# Install Python via uv and create convenience symlinks
+RUN uv python install ${PYTHON_VERSION} && \
+    PYTHON_BIN=$(readlink -f ~/.local/bin/python${PYTHON_VERSION}) && \
+    PYTHON_DIR=$(dirname "$PYTHON_BIN") && \
+    ln -sf "python${PYTHON_VERSION}" ~/.local/bin/python && \
+    ln -sf "$PYTHON_DIR/pip3" ~/.local/bin/pip3 && \
+    ln -sf "$PYTHON_DIR/pip3" ~/.local/bin/pip && \
+    rm -f "$(dirname "$PYTHON_DIR")/lib/python${PYTHON_VERSION}/EXTERNALLY-MANAGED"
+# Install CLI tools via uv
+RUN uv tool install cookiecutter==${COOKIECUTTER_VERSION}
 # Install Oh My Zsh and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
     sed -i 's/plugins=(git)/plugins=(git)/g' ~/.zshrc

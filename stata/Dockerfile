@@ -25,6 +25,8 @@ RUN mkdir -p /tmp/runtime-ubuntu && \
 COPY ./stata/scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/stata-gui /usr/local/bin/install-stata-license
 USER ubuntu
+RUN /scripts/install_jupyter.sh
+RUN /scripts/install_nbstata.sh
 # Set working directory
 WORKDIR /workspaces
 # Set the default command

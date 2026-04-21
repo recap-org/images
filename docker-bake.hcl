@@ -1,8 +1,8 @@
 variable "IMAGE_VERSION" {
-  default = "2026.1.6"
+  default = "2026.2.0"
 }
 variable "RECAP_RELEASE" {
-  default = "2026-q1"
+  default = "2026-q2"
 }
 
 variable "UBUNTU_VERSION" {
@@ -12,19 +12,28 @@ variable "MIKTEX_VERSION" {
   default = "26.2"
 }
 variable "TEX_FMT_VERSION" {
-  default = "0.5.6"
+  default = "0.5.7"
+}
+variable "UV_VERSION" {
+  default = "0.11.7"
+}
+variable "PYTHON_VERSION" {
+  default = "3.14"
 }
 variable "COOKIECUTTER_VERSION" {
-  default = "2.6.0"
+  default = "2.7.1"
 }
 variable "R_VERSION" {
-  default = "4.5.2"
+  default = "4.5.3"
 }
 variable "QUARTO_VERSION" {
-  default = "1.8.27"
+  default = "1.9.37"
 }
 variable "RADIAN_VERSION" {
   default = "0.6.15"
+}
+variable "RV_VERSION" {
+  default = "0.20.0"
 }
 variable "STATA_VERSION" {
   default = "Now 19 MP"
@@ -75,11 +84,14 @@ target "core" {
     UBUNTU_VERSION       = UBUNTU_VERSION
     MIKTEX_VERSION       = MIKTEX_VERSION
     TEX_FMT_VERSION      = TEX_FMT_VERSION
+    UV_VERSION           = UV_VERSION
+    PYTHON_VERSION       = PYTHON_VERSION
     COOKIECUTTER_VERSION = COOKIECUTTER_VERSION
-    R_VERSION          = R_VERSION
-    QUARTO_VERSION     = QUARTO_VERSION
-    RADIAN_VERSION     = RADIAN_VERSION
-    STATA_VERSION      = STATA_VERSION
+    R_VERSION            = R_VERSION
+    QUARTO_VERSION       = QUARTO_VERSION
+    RADIAN_VERSION       = RADIAN_VERSION
+    RV_VERSION           = RV_VERSION
+    STATA_VERSION        = STATA_VERSION
   }
   labels = {
     "org.opencontainers.image.version" = IMAGE_VERSION

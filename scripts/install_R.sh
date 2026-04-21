@@ -14,6 +14,8 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
+ARCH=$(dpkg --print-architecture)
+
 # install R
 wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc \
   | sudo gpg --dearmor -o /usr/share/keyrings/cran.gpg
@@ -42,17 +44,17 @@ sudo apt-get -y install --no-install-recommends \
     r-base-dev=${R_FULL} \
     r-doc-html=${R_FULL}
 
-sudo apt-get purge -y --auto-remove 
-sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/* 
-sudo find /usr/share/doc -depth -type f ! -name copyright -delete 
-sudo find /usr/share/doc -empty -delete 
+sudo apt-get purge -y --auto-remove
+sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+sudo find /usr/share/doc -depth -type f ! -name copyright -delete
+sudo find /usr/share/doc -empty -delete
 sudo rm -rf /usr/share/man/* /usr/share/info/*
 
 sudo mkdir -p /usr/local/lib/R/site-library
 sudo chown -R ${RECAP_USER:-ubuntu} /usr/local/lib/R/site-library
 sudo chmod -R a+rwX /usr/local/lib/R/site-library
 
-# Install R packages
+# Configure R package repositories
 sudo tee /usr/lib/R/etc/Rprofile.site > /dev/null <<'EOF'
 local({
   options(
@@ -64,19 +66,25 @@ local({
   )
   options(
     HTTPUserAgent = sprintf(
-      "R/%s R (%s)", 
-      getRversion(), 
+      "R/%s R (%s)",
+      getRversion(),
       paste(getRversion(), R.version["platform"], R.version["arch"], R.version["os"])
     )
   )
 })
 EOF
-Rscript -e "install.packages('pak')"
-Rscript -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver','ManuelHentschel/vscDebugger', 'nx10/httpgd'))"
 
-# Install radian via pipx
-sudo -E pipx install radian==${RADIAN_VERSION}
-sudo rm -rf ${PIPX_HOME}/venvs/*/lib/*/site-packages/tests
+# Install R packages
+Rscript -e "install.packages('pak')"
+Rscript -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver', 'httpgd', 'ManuelHentschel/vscDebugger'))"
+
+# Install radian via uv
+uv tool install radian==${RADIAN_VERSION}
+
+# Install rv (R dependency manager)
+curl -fsSL "https://github.com/A2-ai/rv/releases/download/v${RV_VERSION}/rv-v${RV_VERSION}-$([ "$ARCH" = "arm64" ] && echo aarch64 || echo x86_64)-unknown-linux-gnu.tar.gz" \
+    | sudo tar -xz -C /usr/local/bin
+
 sudo mkdir -p /renv/cache
 sudo chmod -R a+rwX /renv
 

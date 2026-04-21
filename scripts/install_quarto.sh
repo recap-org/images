@@ -15,7 +15,7 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 ARCH=$(dpkg --print-architecture)
-sudo apt-get update && sudo apt-get install -y pandoc --no-install-recommends
+sudo apt-get update
 sudo curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCH}.deb \
     -o /tmp/quarto.deb
 sudo apt-get install -y /tmp/quarto.deb
