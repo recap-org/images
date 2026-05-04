@@ -16,33 +16,14 @@ fi
 
 ARCH=$(dpkg --print-architecture)
 
-# install R
-wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc \
-  | sudo gpg --dearmor -o /usr/share/keyrings/cran.gpg
-
-echo "deb [signed-by=/usr/share/keyrings/cran.gpg] \
-    https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" \
-    | sudo tee /etc/apt/sources.list.d/cran.list > /dev/null
+# Install rig (sets up CRAN + PPM, installs pak with sysreqs, configures user libraries)
+sudo curl -fsSL https://rig.r-pkg.org/deb/rig.gpg -o /etc/apt/trusted.gpg.d/rig.gpg
+echo "deb http://rig.r-pkg.org/deb rig main" | sudo tee /etc/apt/sources.list.d/rig.list > /dev/null
 sudo apt-get update
+sudo apt-get -y install --no-install-recommends r-rig
 
-R_FULL=$(apt-cache madison r-base \
-  | awk '{print $3}' \
-  | grep -E "^${R_VERSION}(-|$)" \
-  | sort -Vr \
-  | head -n1)
-
-if [ -z "$R_FULL" ]; then
-  echo "Error: R ${R_VERSION} not found in repository"
-  exit 1
-fi
-
-echo "Installing R version: $R_FULL"
-
-sudo apt-get -y install --no-install-recommends \
-    r-base=${R_FULL} \
-    r-base-html=${R_FULL} \
-    r-base-dev=${R_FULL} \
-    r-doc-html=${R_FULL}
+# Install R
+sudo rig add ${R_VERSION}
 
 sudo apt-get purge -y --auto-remove
 sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/*
@@ -50,32 +31,7 @@ sudo find /usr/share/doc -depth -type f ! -name copyright -delete
 sudo find /usr/share/doc -empty -delete
 sudo rm -rf /usr/share/man/* /usr/share/info/*
 
-sudo mkdir -p /usr/local/lib/R/site-library
-sudo chown -R ${RECAP_USER:-ubuntu} /usr/local/lib/R/site-library
-sudo chmod -R a+rwX /usr/local/lib/R/site-library
-
-# Configure R package repositories
-sudo tee /usr/lib/R/etc/Rprofile.site > /dev/null <<'EOF'
-local({
-  options(
-    repos = c(
-      P3M = 'https://packagemanager.posit.co/cran/__linux__/noble/latest',
-      CRAN = 'https://packagemanager.posit.co/cran/latest'
-    ),
-    download.file.method = 'libcurl'
-  )
-  options(
-    HTTPUserAgent = sprintf(
-      "R/%s R (%s)",
-      getRversion(),
-      paste(getRversion(), R.version["platform"], R.version["arch"], R.version["os"])
-    )
-  )
-})
-EOF
-
-# Install R packages
-Rscript -e "install.packages('pak')"
+# Install R packages (pak preinstalled by rig)
 Rscript -e "pak::pkg_install(c('renv', 'rmarkdown', 'languageserver', 'httpgd', 'ManuelHentschel/vscDebugger'))"
 
 # Install radian via uv

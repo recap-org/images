@@ -1,5 +1,5 @@
 variable "IMAGE_VERSION" {
-  default = "2026.2.0"
+  default = "2026.2.1"
 }
 variable "RECAP_RELEASE" {
   default = "2026-q2"
@@ -24,7 +24,7 @@ variable "COOKIECUTTER_VERSION" {
   default = "2.7.1"
 }
 variable "R_VERSION" {
-  default = "4.5.3"
+  default = "4.6.0"
 }
 variable "QUARTO_VERSION" {
   default = "1.9.37"
