@@ -1,21 +1,21 @@
 variable "IMAGE_VERSION" {
-  default = "2026.2.1"
+  default = "2026.3.0"
 }
 variable "RECAP_RELEASE" {
-  default = "2026-q2"
+  default = "2026-q3"
 }
 
 variable "UBUNTU_VERSION" {
   default = "24.04"
 }
 variable "MIKTEX_VERSION" {
-  default = "26.2"
+  default = "26.5"
 }
 variable "TEX_FMT_VERSION" {
   default = "0.5.7"
 }
 variable "UV_VERSION" {
-  default = "0.11.7"
+  default = "0.12.5"
 }
 variable "PYTHON_VERSION" {
   default = "3.14"
@@ -24,19 +24,19 @@ variable "COOKIECUTTER_VERSION" {
   default = "2.7.1"
 }
 variable "R_VERSION" {
-  default = "4.6.0"
+  default = "4.6.1"
 }
 variable "QUARTO_VERSION" {
-  default = "1.9.37"
+  default = "1.10.18"
 }
 variable "RADIAN_VERSION" {
-  default = "0.6.15"
+  default = "0.6.16"
 }
 variable "RV_VERSION" {
-  default = "0.20.0"
+  default = "0.22.2"
 }
 variable "STATA_VERSION" {
-  default = "Now 19 MP"
+  default = "StataNow 19.5 MP"
 }
 
 variable "PLATFORMS" {
