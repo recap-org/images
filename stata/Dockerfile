@@ -2,7 +2,12 @@
 
 FROM core
 USER root
-COPY --from=dataeditors/stata19_5-mp-x:2026-02-18 /usr/local/stata /usr/local/stata
+# StataNow 19.5 MP. The dated tag is an upstream build date, not a Stata version
+# and not exactly the update date either (tag 2026-06-03 carries an `update all`
+# run from 10 Jul 2026). The authoritative record of the executable + ado update
+# level is /usr/local/stata/update.log inside the built image.
+# Keep STATA_VERSION in docker-bake.hcl in sync with the user-facing version.
+COPY --from=dataeditors/stata19_5-mp-x:2026-06-03 /usr/local/stata /usr/local/stata
 ENV PATH="/usr/local/stata:${PATH}"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libncurses6
